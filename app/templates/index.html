@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Processor</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Text Processor</h1>
+        
+        <div class="upload-section">
+            <form id="textForm">
+                <input type="file" id="textFile" accept=".txt" required>
+                
+                <div class="processing-options">
+                    <h3>Preprocessing Options:</h3>
+                    <select id="preprocessingMethod">
+                        <option value="">None</option>
+                        <option value="tokenize">Tokenize</option>
+                        <option value="remove_punctuation">Remove Punctuation</option>
+                        <option value="pad">Pad Text</option>
+                    </select>
+                    
+                    <h3>Augmentation Options:</h3>
+                    <select id="augmentationMethod">
+                        <option value="">None</option>
+                        <option value="synonym">Synonym Replacement</option>
+                        <option value="random_insertion">Random Insertion</option>
+                    </select>
+                </div>
+                
+                <button type="submit">Process Text</button>
+            </form>
+        </div>
+        
+        <div class="output-section">
+            <div class="text-box">
+                <h3>Original Text:</h3>
+                <div id="originalText" class="text-content"></div>
+            </div>
+            
+            <div class="text-box">
+                <h3>Preprocessed Text:</h3>
+                <div id="preprocessedText" class="text-content"></div>
+            </div>
+            
+            <div class="text-box">
+                <h3>Augmented Text:</h3>
+                <div id="augmentedText" class="text-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('textForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('textFile').files[0]);
+            formData.append('preprocessing_method', document.getElementById('preprocessingMethod').value);
+            formData.append('augmentation_method', document.getElementById('augmentationMethod').value);
+            
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('originalText').textContent = data.original_text;
+                document.getElementById('preprocessedText').textContent = data.preprocessed_text;
+                document.getElementById('augmentedText').textContent = data.augmented_text;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html> 
